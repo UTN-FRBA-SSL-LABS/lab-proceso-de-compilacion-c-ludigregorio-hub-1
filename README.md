@@ -1,4 +1,3 @@
-[![Review Assignment Due Date](https://classroom.github.com/assets/deadline-readme-button-22041afd0340ce965d47ae6ef1cefeee28c7c493a6346c4f15d667ab976d596c.svg)](https://classroom.github.com/a/iVzT1xMN)
 # Laboratorio: El Proceso de Compilación en C
 
 **Materia:** Sintaxis y Semántica de los Lenguajes (UTN-FRBA)
@@ -57,17 +56,7 @@ nm programa   > salidas/nm_ejecutable.txt        # guarda la tabla de símbolos 
 
 Abrí el archivo con cualquier editor y respondé cada pregunta en el lugar indicado, con la salida real de los comandos que ejecutaste.
 
-#### Paso 4: Verificar localmente y hacer push
-
-Antes de pushear, verificá tu puntaje local con:
-
-```bash
-make test
-```
-
-> **Tip:** el workflow de corrección solo se activa cuando pusheás cambios en archivos `.i`, `.s`, `.c`, `salidas/` o `proceso_compilacion.md`. Para todo lo demás, `make test` te da el mismo resultado sin consumir minutos de GitHub Actions.
-
-#### Paso 4b: Commitear y hacer push
+#### Paso 4: Commitear y hacer push
 
 Verificar qué archivos están listos para commitear:
 
@@ -350,7 +339,7 @@ LINEAS_I=821
 
 ¿Por qué ese número es tan mayor que las 94 líneas de `programa.c`?
 
-> **R:* 821 *
+> **R:**Porque la  #include <stdio.h> y <stdlib.h> le indica al preprocesador que copie y pegue textualmente el contenido completo de esos archivos de cabecera del sistema en nuestro código. Lo que expande masivamente la cantidad de líneas del archivo.
 
 ---
 
@@ -390,9 +379,10 @@ grep "Archivo fuente principal" programa.i   # no debe encontrar nada
 
 <!-- Completá con SI (si encontró algo) o NO (si no encontró nada): -->
 COMENTARIOS_EN_I=NO
+
 ¿Por qué ocurre eso?
 
-> **R:*ESTO OCURRE PORQUE UNA DE LAS TAREAS PRINCIPALES DEL PREPROCESADOR ES ELIMINAR TODOS LOS COMENTARIOS DEL CODIGO FUENTE ORIGINAL ANTES DE PASARSELO AL COMPILADOR*
+> **R:**Esto ocurre porque en el preprocesamiento se eliminan todos los comentarios del codigo fuente, ya que no son utiles para el proceso restante.
 
 ---
 
@@ -421,18 +411,19 @@ Nótese que `CUADRADO(5)` se expande a `((5) * (5))`, con los paréntesis extra 
 
 **P3.** Ejecutá `grep -n "CUADRADO" programa.i` y copiá la salida completa.
 
-> **R:*790:    printf("CUADRADO(%d)      = %d\n", 5, ((5) * (5)));*
+> **R:**790:    printf("CUADRADO(%d)      = %d\n", 5, ((5) * (5)));
 
 ¿El nombre `CUADRADO` aparece tal cual en `programa.i`, o fue reemplazado
-por otra cosa? Respondé SI o NO:NO
+por otra cosa? Respondé SI o NO:
 
 <!-- Completá con SI o NO: -->
 CUADRADO_EN_I=NO
+
 ---
 
 **P4.** Ejecutá `grep -n '"1\.0"' programa.i` y copiá la línea encontrada.
 
-> **R:*781:    printf("=== Laboratorio de Compilacion en C (v%s) ===\n\n", "1.0");*
+> **R:**781:    printf("=== Laboratorio de Compilacion en C (v%s) ===\n\n", "1.0");
 
 ¿Cuál era el nombre de la macro en `programa.c` que fue reemplazada por `"1.0"`?
 
@@ -473,10 +464,10 @@ gcc -E programa.c | grep "Iniciando"
 gcc -E -DDEBUG programa.c | grep "Iniciando"
 ```
 
-> **R:*EL PRIMER COMANDO NO DEVUELVE NADA, EL SEGUNDO COMANDO DEVUELVE  "printf("[DEBUG] %s\n", ("Iniciando main"));"*
+> **R:** el primero no dio nada de salida y el segundo mostro esto: printf("[DEBUG] %s\n", ("Iniciando main"));
 
 ¿Agregar `-DDEBUG` hace que aparezca código nuevo en el `.i` que antes no estaba?
-Respondé SI o NO:NO
+Respondé SI o NO:
 
 <!-- Completá con SI o NO: -->
 DEBUG_ACTIVA_CODIGO=SI
@@ -502,7 +493,7 @@ grep -n "stdio.h" programa.i | head -5
 
 ¿Qué información comunican esas líneas `# N "archivo"`? ¿De qué archivo proviene el bloque que contiene la declaración de `printf`?
 
-> **R:*lA DECLARACION PRINTF PROVIENE DEL ARCHIVO STUDIO.H*
+> **R:** Esas líneas funcionan como marcadores. Le comunican al compilador el número de línea y el nombre del archivo original de donde salió el bloque de código. En este caso, la declaración de printf proviene del archivo de la biblioteca estándar del sistema, su ruta local es c:\mingw\include\stdio.h.
 
 ---
 
@@ -658,8 +649,9 @@ Aparecen como instrucciones de llamada (por ejemplo `bl _area_circulo`), pero **
 
 **P7.** Ejecutá `grep "area_circulo" programa.s` y copiá la salida.
 
-> **R:* call    _area_circulo .def    _area_circulo;  .scl   
->  2;  .type   32; .endef*
+> **R:**programa.s:44:  .ascii "area_circulo(%.1f) = %.4f\12\0"
+programa.s:88:  call    _area_circulo
+programa.s:155: .def    _area_circulo;  .scl    2;      .type   32;     .endef
 
 ¿`area_circulo` aparece como una función *definida* en `programa.s`
 (con su propio bloque de instrucciones) o solo como una *llamada* (instrucción sin cuerpo)?
@@ -673,12 +665,12 @@ AREA_EN_S=LLAMADA
 **P8.** Encontrá en `programa.s` la etiqueta `sumar:` o `_sumar:` y copiá
 las primeras 4 líneas de instrucciones que le siguen.
 
-> **R:*pushl   %ebp movl    %esp, %ebp movl    _llamadas, %eax addl    $1, %eax*
+> **R:**LFB14: .cfi_startproc pushl	%ebp cfi_def_cfa_offset 8
 
 Explicá en términos generales qué hacen esas instrucciones
 (usá los comentarios del laboratorio como guía):
 
-> **R:*Las primeras instrucciones preparan el 'stack frame' (contexto de la función en memoria). Luego, se accede a la variable global _llamadas, se carga su valor en el registro %eax y se le suma 1 usando la instrucción addl.*
+> **R:**
 
 ---
 
@@ -691,13 +683,13 @@ grep "llamadas" programa.s
 
 **P9.** Ejecutá `grep "llamadas" programa.s` y copiá la salida.
 
-> **R:*.globl  _llamadas _llamadas:*
+> **R:**programa.s:2:   .globl  _llamadas programa.s:5:_llamadas: programa.s:18:  movl    _llamadas, %eax programa.s:20:  movl    %eax, _llamadas programa.s:50:  .ascii "Llamadas a sumar(): %d\12\0" programa.s:112: movl    _llamadas, %eax
 
 ¿Aparece la variable `llamadas` en el ensamblador?
 Respondé SI o NO:
 
 <!-- Completá con SI o NO: -->
-LLAMADAS_EN_S=si
+LLAMADAS_EN_S=SI
 
 ---
 
@@ -801,11 +793,10 @@ Salida esperada (simplificada):
 
 **P10.** Ejecutá `nm programa.o` y copiá la salida completa.
 
-> **R:* 00000000 b .bss 00000000 d .data 00000000 r .eh_frame 00000000 r .rdata 00000000 r .rdata$zzz 00000000 t .text U ___main U _area_circulo U _factorial 00000132 T _imprimir_separador   00000000 B _llamadas   0000001a T _main   U _printf    U _puts    00000000 T _sumar*
+> **R:**00000000 b .bss 00000000 d .data 00000000 r .eh_frame 00000000 r .rdata 00000000 r .rdata$zzz 00000000 t .text U ___main U _area_circulo U _factorial 00000132 T _imprimir_separador 00000000 B _llamadas 0000001a T _main U _printf U _puts 00000000 T _sumar
 
 ¿Con qué letra aparece `area_circulo` en esa tabla?
 Escribí solo la letra (una mayúscula):
-
 <!-- Completá con la letra exacta que muestra nm (U, T, D, etc.): -->
 TIPO_AREA_EN_O=U
 
@@ -827,7 +818,7 @@ nm matematica.o
 **P11.** ¿Por qué `area_circulo` tiene ese tipo en `programa.o`
 pero tipo `T` en `matematica.o`?
 
-> **R:* Porque en programa.o la función solo se menciona (se usa), pero su código no está ahí, por eso aparece como U (Undefined). En cambio, en matematica.o es donde el programador realmente escribió el cuerpo de la función, por eso allí aparece como T *
+> **R:** Porque en programa.o la función aparece como U ya que en ese archivo solo se hace la llamada a la función, pero no contiene el código de cómo se calcula.En matematica.o aparece como T porque en ese archivo fuente es donde está escrita y definida la lógica interna de la función.
 
 ¿Qué etapa del proceso de compilación resuelve esa diferencia?
 Respondé con una palabra: PREPROCESAMIENTO, COMPILACION, ENSAMBLADO o ENLAZADO:
@@ -852,7 +843,7 @@ Un `.o` no es ejecutable por dos razones:
 
 **P12.** Intentá ejecutar `./programa.o` directamente. ¿Qué mensaje aparece?
 
-> **R:*bash: ./programa.o: cannot execute binary file: Exec format error*
+> **R:** No me aparecio ningun mensaje, me permitio abrirlo en bloc de notas y observar que es mucho codigo binario
 
 ¿Se puede ejecutar un archivo `.o` directamente?
 Respondé SI o NO:
@@ -947,7 +938,7 @@ nm programa | grep area_circulo
 **P13.** Enlazá con `gcc programa.o matematica.o -o programa`.
 Ejecutá `nm programa | grep "area_circulo"` y copiá la salida.
 
-> **R:*004015a8 T _area_circulo*
+> **R:**004015a8 T _area_circulo
 
 ¿Con qué letra aparece ahora `area_circulo` en el ejecutable final?
 Escribí solo la letra:
@@ -969,18 +960,17 @@ Quedan algunos `U` incluso en el ejecutable final. ¿Por qué? Son funciones de 
 
 **P14.** Ejecutá `nm programa | grep "^ *U"` y copiá la salida.
 
-> **R:*U ___deregister_frame_info  U ___register_frame_info U __Jv_RegisterClasses *
+> **R:**U ___deregister_frame_info U ___register_frame_info U __Jv_RegisterClasses
 
 ¿Quedan símbolos de tipo `U` en el ejecutable final?
-Respondé SI o NO:SI
+Respondé SI o NO:
 
 <!-- Completá con SI o NO: -->
-SIMBOLOS_U_FINAL=si
+SIMBOLOS_U_FINAL=SI
 
 ¿Por qué quedan? ¿Quién los resuelve y cuándo?
 
-> *r:*Quedan porque son símbolos de bibliotecas compartidas del sistema. No se incluyen en el ejecutable para ahorrar espacio y son resueltos por el Cargador Dinámico (Dynamic Linker) justo en el momento en que el programa se carga en memoria para ejecutarse.*
-
+> **R:** porque son funciones de bibliotecas dinámicas. Para que el ejecutable no pese mucho el enlazador deja una  referencia. Recién cuando corremos el programa, el sistema operativo se encarga de buscar esas funciones y conectarlas (en tiempo de ejecución).
 ---
 
 #### Ejecutar
@@ -993,7 +983,7 @@ SIMBOLOS_U_FINAL=si
 
 **P15.** Ejecutá `./programa` y copiá la salida completa.
 
-> **R:*   0! = 1 1! = 1  2! = 2 3! = 6  4! = 24 5!=120 Llamadas a sumar(): 1*
+> **R:**=== Laboratorio de Compilacion en C (v1.0) ===sumar(3, 4)       = 7                 CUADRADO(5)      = 25                MAX(7, 12)        = 12           area_circulo(5.0) = 78.5398 Factoriales: 0! = 1 1! = 1 2! = 2 3! = 6 4! = 24 5! = 120 ----------------------------------------Llamadas a sumar(): 1
 
 ¿Qué valor da `factorial(5)`? Escribí solo el número:
 
@@ -1010,25 +1000,25 @@ FACTORIAL_5=120
 como `CUADRADO(x)` y una **función real** como `sumar(a, b)`.
 ¿En qué etapa "desaparece" cada una? ¿Cuál tiene verificación de tipos?
 
-> **R:* Una macro es solo un reemplazo de texto literal; el preprocesador copia y pega el código de la macro donde se usa. Una función real es un bloque de código separado en memoria al que se llega mediante un salto (call).Desaparición: La macro desaparece en el Preprocesamiento (Etapa 1). La función real "desaparece" (se convierte en direcciones de memoria) en el Enlazado (Etapa 4).Verificación: Solo la función real tiene verificación de tipos. La macro no sabe de tipos, solo maneja texto*
-
+> **R:**
+ 
 ---
 
 **P17.** ¿Qué diferencia hay entre un símbolo de tipo `T` y uno de tipo `D`
 en la salida de `nm`? ¿En qué sección del archivo objeto vive cada uno?
 
-> **R:* Tipo T (Text): Es código ejecutable (instrucciones). Vive en la sección .text del archivo objeto. Tipo D (Data): Son variables globales ya inicializadas (ej: int x = 5;). Vive en la sección .data.*
+> **R:**La diferencia entre T y D es que la T representa codigo ejecutable (las funciones del programa) que vive en la seccion text .La D representa los datos inicializados (variables globales con valor inicial) que viven en la seccion D
 
 ---
 
 **P18.** (Bonus) Ejecutá `otool -L programa` (macOS) o `ldd programa` (Linux)
 y copiá la salida.
 
-> **R:*        ntdll.dll => /c/WINDOWS/SYSTEM32/ntdll.dll (0x7ffc36f00000) ntdll.dll => /c/Windows/SysWOW64/ntdll.dll (0x76ef0000) wow64.dll => /c/WINDOWS/System32/wow64.dll (0x7ffc34e60000) wow64base.dll => /c/WINDOWS/System32/wow64base.dll (0x7ffc36eb0000) wow64win.dll => /c/WINDOWS/System32/wow64win.dll (0x7ffc34dd0000) wow64con.dll => /c/WINDOWS/System32/wow64con.dll (0x7ffc35030000)*
+> **R:**
 
 ¿Por qué `libc` no hubo que especificarla explícitamente al enlazar con `gcc`?
 
-> **R:* Porque gcc la incluye automáticamente por defecto. Es la biblioteca estándar de C y el compilador asume que cualquier programa la va a necesitar para funciones básicas como printf.*
+> **R:**
 
 ---
 
@@ -1251,5 +1241,10 @@ c. Ejecutar `ldd programa_static` (Linux). ¿Qué diferencia hay respecto a `ldd
 ### E5 — Inspección con Clang
 
 a. Ejecutar `clang -Xclang -dump-tokens programa.c 2>&1 | grep "programa.c" | wc -l`. ¿Cuántos tokens tiene `programa.c`?
+b. Buscar en la salida del AST (`clang -Xclang -ast-dump`) la función `factorial`. ¿Cómo se representa la recursión en el árbol?
+c. ¿Aparece algún `ImplicitCastExpr` en el AST? ¿Qué conversión realiza?
+
+
+
 b. Buscar en la salida del AST (`clang -Xclang -ast-dump`) la función `factorial`. ¿Cómo se representa la recursión en el árbol?
 c. ¿Aparece algún `ImplicitCastExpr` en el AST? ¿Qué conversión realiza?..
