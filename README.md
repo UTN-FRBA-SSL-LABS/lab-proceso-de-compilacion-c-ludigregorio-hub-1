@@ -1248,4 +1248,3 @@ c. ¿Aparece algún `ImplicitCastExpr` en el AST? ¿Qué conversión realiza?
 
 b. Buscar en la salida del AST (`clang -Xclang -ast-dump`) la función `factorial`. ¿Cómo se representa la recursión en el árbol?
 c. ¿Aparece algún `ImplicitCastExpr` en el AST? ¿Qué conversión realiza?..
-:)
